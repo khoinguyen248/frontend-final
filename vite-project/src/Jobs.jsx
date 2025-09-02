@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { SaveOutlined } from "@ant-design/icons";
 import { MdManageSearch } from "react-icons/md";
-import { Space } from "antd";
+import { Select, Space } from "antd";
 import thImage from "./th.jpg";
 import './App.css'
 import { Avatar, Table, Button, Drawer, Form, Radio, Input } from 'antd'
 import ItemPalette from './ItemPalette';
 import DropArea from './DropArea';
 import { search } from './api';
+import { Option } from 'antd/es/mentions';
 
 function Jobs() {
 
@@ -59,6 +60,7 @@ function Jobs() {
   ];
   const [status, setStatus] = useState("enabled");
   const [logic, setLogic] = useState("");
+  const [text, setText] = useState("")
   const [droppedItems, setDroppedItems] = useState([]);
   const [droppedItems2, setDroppedItems2] = useState([]);
   const [listWorkers, setListWorkers] = useState()
@@ -68,8 +70,8 @@ function Jobs() {
   const [screen1, setScreen1] = useState("");
   const [screen2, setScreen2] = useState("");
   const [obj, setObj] = useState("")
-
-
+  const [model, setModel] = useState("")
+  const [topk, setTopk] = useState(0)
   const [retrival, setRetrival] = useState([])
   const [isActive, setIsActive] = useState(true)
   const [isDeleted, setIsDeleted] = useState(true)
@@ -154,11 +156,11 @@ function Jobs() {
       item ? (
         <div style={{ textAlign: "center" }}>
           <img
-            src={item.path} // đường dẫn ảnh
+            src={`http://localhost:8080/${item.path}`} // đường dẫn ảnh
             alt={`frame-${item.frame_id}`}
-            style={{ width: 120, height: 60, objectFit: "cover" }}
+            style={{ width: 300, height: 150, objectFit: "cover" }}
           />
-          <div>{`L: ${item.L} - V: ${item.V}`}</div>
+          <div>{`L: ${item.L} - V: ${item.V} - ${item.frame_id}`}</div>
         </div>
       ) : null,
   }));
@@ -249,7 +251,7 @@ function Jobs() {
                     onChange={(e) => setLogic(e.target.value)}
                     value={logic}
                   >
-                    <Space s>
+                    <Space >
                       <Radio value="AND">AND</Radio>
                       <Radio value="OR">OR</Radio>
                     </Space>
@@ -270,6 +272,16 @@ function Jobs() {
                 onChange={(e) => {
                   setObj(e.target.value);
                   console.log("Obj:", e.target.value);
+                }}
+              />
+
+              <Input
+                style={{ width: '93%' }}
+                placeholder='Text indicator'
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  console.log("text:", e.target.value);
                 }}
               />
 
@@ -301,32 +313,79 @@ function Jobs() {
                 console.log("Screen2:", e.target.value);
               }}
             />
+            <Input
+              style={{ width: '10%' }}
+              placeholder='set top-K'
+              value={topk}
+              onChange={(e) => {
+                setTopk(e.target.value);
+                console.log("Topk: ", e.target.value);
+              }}
+            />
+            <Select
+              style={{ width: '10%' }}
+              value={model}
+              onChange={(value) => setModel(value)}
+            >
+              <Option value="beit3">beit3</Option>
+              <Option value="clip">clip</Option>
+            </Select>
             <Button onClick={async (e) => {
               e.preventDefault();
-              const searchObject = {
-                query1: screen1,
-                query2: screen2,
-                model: "beit3",
-                k: 200,
-                augment: false,
-                detection: detection,   // lấy từ DropArea
-                objects: obj,
-                device: "cpu",
-                operator: logic,
-                page: 1,
-                page_size: 10
-              };
-              console.log("Search Object:", searchObject);
-              try {
 
-                const respone = await search(searchObject)
-                const result = respone.data.paths
-                setRetrival(result)
-                console.log(result)
-              } catch (err) {
-                console.error("Signup failed:", err.response?.data || err.message);
+
+              if (screen1 === "" && screen2 === "") {
+                const searchObject = {
+                  k: topk,
+                  detection: detection,
+                  objects: obj,
+                  device: "cpu",
+                  operator: logic,
+                  page: 1,
+                  page_size: 10,
+                  model: model,
+                  augment: false
+                }
+                console.log("Search Object:", searchObject);
+                try {
+
+                  const respone = await search(searchObject)
+                  const result = respone.data
+                  setRetrival(result)
+                  console.log(result)
+                } catch (err) {
+                  console.error("Signup failed:", err.response?.data || err.message);
+
+                }
+
+              } else {
+                const searchObject = {
+                  query1: screen1,
+                  query2: screen2,
+                  model: model,
+                  k: topk,
+                  augment: false,
+                  detection: detection,   // lấy từ DropArea
+                  objects: obj,
+                  device: "cpu",
+                  operator: logic,
+                  page: 1,
+                  page_size: 10
+                };
+                console.log("Search Object:", searchObject);
+                try {
+
+                  const respone = await search(searchObject)
+                  const result = respone.data.paths
+                  setRetrival(result)
+                  console.log(result)
+                } catch (err) {
+                  console.error("Signup failed:", err.response?.data || err.message);
+
+                }
 
               }
+
 
 
             }} title="Activate advanced searching">

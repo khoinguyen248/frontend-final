@@ -21,7 +21,7 @@ export default function DropArea({ droppedItems, onDrop, onRemove , onStateChang
     }, {})
   )
     .map((arr) => arr.join(" "))
-    .join(", ");
+    .join(" ");
 
 
 
