@@ -232,7 +232,7 @@ function Jobs() {
               background: "#fff",
             }}
           >
-            {/* --- Header (nếu bạn muốn header custom, đã đặt title prop nên có thể bỏ) */}
+          
             {/* <div className='header' style={{ borderBottom: "1px solid #d9d9d9", paddingBottom: 8 }}>
         <h1 style={{ fontFamily: 'sans-serif', margin: 0 }}>Advanced Searching</h1>
       </div> */}
