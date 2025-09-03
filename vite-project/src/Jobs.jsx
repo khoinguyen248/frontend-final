@@ -9,8 +9,12 @@ import ItemPalette from './ItemPalette';
 import DropArea from './DropArea';
 import { search } from './api';
 import { Option } from 'antd/es/mentions';
+import { MenuOutlined } from "@ant-design/icons";
 
 function Jobs() {
+  const [drawerOpen, setDrawerOpen] = useState(false); // mở mặc định
+  const openDrawer = () => setDrawerOpen(true);
+  const closeDrawer = () => setDrawerOpen(false);
 
   // items.js
   const availableItems = [
@@ -203,93 +207,81 @@ function Jobs() {
   return (
     <>
       <div style={{ display: 'flex' }}>
-        <div style={{ width: '23%' }}>
-          <div style={{
+        {/*bắt đầu drawer ant design */}
 
 
-            height: '100vh',
-            backgroundColor: '#fff',
-            borderRight: '1px solid #ddd',
-            overflowY: 'auto',
-            width: '100%',
+        <Drawer
+          title={<h2 style={{ margin: 0, fontFamily: "sans-serif" }}>Advanced Searching</h2>}
+          placement="right"
+          onClose={closeDrawer}
+          open={drawerOpen}
+          width={360}                 // chỉnh số px nếu cần (hoặc dùng '23vw')
+          mask={false}                // không che overlay — giống sidebar
+          closable={true}             // hiện nút đóng (x)
+          bodyStyle={{ padding: 20 }}
+          style={{ height: "100vh", overflow: "hidden" }}
+          getContainer={false}        // render inline trong DOM của component (tùy ý)
+        >
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+              overflowY: "auto",
+              background: "#fff",
+            }}
+          >
+            {/* --- Header (nếu bạn muốn header custom, đã đặt title prop nên có thể bỏ) */}
+            {/* <div className='header' style={{ borderBottom: "1px solid #d9d9d9", paddingBottom: 8 }}>
+        <h1 style={{ fontFamily: 'sans-serif', margin: 0 }}>Advanced Searching</h1>
+      </div> */}
 
-          }}>
-            <div className='header' style={{ width: '100%', height: '10%', borderBottom: "1px solid #d9d9d9", borderTop: "none", borderLeft: "none", borderRight: "none" }}>      <h1 style={{ fontFamily: 'sans-serif', marginLeft: '10px' }}>Advanced Searching</h1></div>
+            {/* Nội dung cũ của bạn (giữ nguyên) */}
+            <ItemPalette items={availableItems} />
 
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Radio.Group onChange={(e) => setStatus(e.target.value)} value={status}>
+                <Space>
+                  <Radio value="enabled">Enabled</Radio>
+                  <Radio value="disabled">Disabled</Radio>
+                </Space>
+              </Radio.Group>
 
-            <div
-              style={{
-                flex: 1,
-                overflowY: 'auto',
-                padding: 20,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 10,
-                fontFamily: 'sans-serif'
-              }}
-            >
-              <ItemPalette items={availableItems} />
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                {/* Group Enabled / Disabled */}
-
-                <Radio.Group
-                  onChange={(e) => setStatus(e.target.value)}
-                  value={status}
-                >
-                  <Space >
-
-
-                    <Radio value="enabled">Enabled</Radio>
-                    <Radio value="disabled">Disabled</Radio>
+              <div style={{ marginTop: 8 }}>
+                <Radio.Group onChange={(e) => setLogic(e.target.value)} value={logic}>
+                  <Space>
+                    <Radio value="AND">AND</Radio>
+                    <Radio value="OR">OR</Radio>
                   </Space>
                 </Radio.Group>
-
-                {/* Group AND / OR */}
-                <div>
-
-                  <Radio.Group
-                    onChange={(e) => setLogic(e.target.value)}
-                    value={logic}
-                  >
-                    <Space >
-                      <Radio value="AND">AND</Radio>
-                      <Radio value="OR">OR</Radio>
-                    </Space>
-                  </Radio.Group>
-                </div>
               </div>
-              <DropArea
-
-                droppedItems={droppedItems}
-                onDrop={handleDrop}
-                onRemove={handleRemove}
-                onStateChange={setDetection}
-              />
-              <Input
-                style={{ width: '93%' }}
-                placeholder='Object fillin'
-                value={obj}
-                onChange={(e) => {
-                  setObj(e.target.value);
-                  console.log("Obj:", e.target.value);
-                }}
-              />
-
-              <Input
-                style={{ width: '93%' }}
-                placeholder='Text indicator'
-                value={text}
-                onChange={(e) => {
-                  setText(e.target.value);
-                  console.log("text:", e.target.value);
-                }}
-              />
-
             </div>
-          </div>
 
-        </div>
-        <div style={{ width: '76%', paddingLeft: '10px' }}>
+            <DropArea
+              droppedItems={droppedItems}
+              onDrop={handleDrop}
+              onRemove={handleRemove}
+              onStateChange={setDetection}
+            />
+
+            <Input
+              style={{ width: "93%" }}
+              placeholder="Object fillin"
+              value={obj}
+              onChange={(e) => setObj(e.target.value)}
+            />
+
+            <Input
+              style={{ width: "93%" }}
+              placeholder="Text indicator"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+          </div>
+        </Drawer>
+        {/*kết thúc drawer*/}
+        <div style={{ width: '100%', paddingLeft: '10px' }}>
           <div style={{ width: '100%', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 
 
@@ -330,6 +322,7 @@ function Jobs() {
               <Option value="beit3">beit3</Option>
               <Option value="clip">clip</Option>
             </Select>
+           
             <Button onClick={async (e) => {
               e.preventDefault();
 
@@ -389,9 +382,16 @@ function Jobs() {
 
 
             }} title="Activate advanced searching">
+             
               <MdManageSearch size={20} />
 
             </Button>
+             <Button
+              type="text"
+              onClick={openDrawer}
+              style={{}}
+              icon={<MenuOutlined />}
+            />
 
 
           </div>
@@ -399,7 +399,7 @@ function Jobs() {
           <div>
             {/*trong retrival có bao nhiêu item thì hiển thị 5 item 1 hàng, nội dung của từng cột sẽ là ảnh 120X60 lấy từ path của mỗi item, phía dưới mỗi ảnh sẽ để L - V*/}
             <Table
-              style={{ width: "100%", margin: "auto" }}
+              style={{ width: "100%", margin: "0" }}
               dataSource={dataSource}
               columns={columns}
               pagination={{
