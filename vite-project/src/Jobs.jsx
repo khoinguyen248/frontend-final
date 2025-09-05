@@ -1,10 +1,9 @@
+// Jobs.jsx
 import { useEffect, useState } from 'react'
-import { SaveOutlined } from "@ant-design/icons";
 import { MdManageSearch } from "react-icons/md";
 import { Select, Space } from "antd";
-import thImage from "./th.jpg";
 import './App.css'
-import { Avatar, Table, Button, Drawer, Form, Radio, Input } from 'antd'
+import { Table, Button, Drawer, Form, Radio, Input } from 'antd'
 import ItemPalette from './ItemPalette';
 import DropArea from './DropArea';
 import { search } from './api';
@@ -12,11 +11,11 @@ import { Option } from 'antd/es/mentions';
 import { MenuOutlined } from "@ant-design/icons";
 
 function Jobs() {
-  const [drawerOpen, setDrawerOpen] = useState(false); // mở mặc định
+  const [drawerOpen, setDrawerOpen] = useState(true); // mở mặc định
   const openDrawer = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
 
-  // items.js
+  // palette items
   const availableItems = [
     { id: 'person', label: 'person', icon: '👤' },
     { id: 'man', label: 'man', icon: '👨' },
@@ -61,112 +60,92 @@ function Jobs() {
     { id: 'pink', label: 'pink', icon: '🌸' },
     { id: 'orange', label: 'orange', icon: '🟠' },
     { id: 'gray', label: 'gray', icon: '⚙️' },
+    { id: 'traffic_sign', label: 'traffic_sign', icon: '🚸' }
   ];
+
+  // UI state
   const [status, setStatus] = useState("enabled");
-  const [logic, setLogic] = useState("");
+  const [logic, setLogic] = useState("AND");
   const [text, setText] = useState("")
   const [droppedItems, setDroppedItems] = useState([]);
   const [droppedItems2, setDroppedItems2] = useState([]);
-  const [listWorkers, setListWorkers] = useState()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [toogle, setToogle] = useState(false)
   const [screen1, setScreen1] = useState("");
   const [screen2, setScreen2] = useState("");
+   const [screen3, setScreen3] = useState("");
+
   const [obj, setObj] = useState("")
-  const [model, setModel] = useState("")
-  const [topk, setTopk] = useState(0)
-  const [retrival, setRetrival] = useState([])
-  const [isActive, setIsActive] = useState(true)
-  const [isDeleted, setIsDeleted] = useState(true)
+  const [model, setModel] = useState("beit3")
+  const [topk, setTopk] = useState(100)
+  const [retrival, setRetrival] = useState([]) // array of objects {path, L, V, frame_id, ...}
+  const [detection, setDetection] = useState(""); // detection từ DropArea
+
+  // Drop handlers
   const handleDrop = (item, position) => {
-    setDroppedItems(prev => [
-      ...prev,
-      { ...item, position }
-    ]);
+    setDroppedItems(prev => [...prev, { ...item, position }]);
   };
   const handleDrop2 = (item, position) => {
-    setDroppedItems2(prev => [
-      ...prev,
-      { ...item, position }
-    ]);
+    setDroppedItems2(prev => [...prev, { ...item, position }]);
   };
-
-  const handleRemove = (index) => {
-    setDroppedItems(prev =>
-      prev.filter((_, i) => i !== index)
-    );
-  };
-  const handleRemove2 = (index) => {
-    setDroppedItems2(prev =>
-      prev.filter((_, i) => i !== index)
-    );
-  };
-  const fetchOne = async () => {
-    try {
-
-      const respone = await getAlljobs()
-      const data = await respone.data.data
-      console.log(data)
-      setListWorkers(data)
-
-    }
-    catch {
-      console.log('error')
-    }
-
-  }
+  const handleRemove = (index) => setDroppedItems(prev => prev.filter((_, i) => i !== index));
+  const handleRemove2 = (index) => setDroppedItems2(prev => prev.filter((_, i) => i !== index));
 
   const [form] = Form.useForm();
 
-  const onFinish = async (values) => {
-    const status = values.status;
-
-    const newJob = {
-      name: values.name,
-      code: values.code,
-      des: values.description,
-      is_active: status === "active",
-      is_deleted: status === "inactive",
-    };
-
-    try {
-      const response = await addjobs(newJob);
-      console.log(response.data);
-      alert('Job created!');
-      setToogle(false);
-      form.resetFields();
-      fetchOne();
-    } catch (err) {
-      console.error("Add job failed:", err.response?.data || err.message);
-    }
-  };
-
-
-
-
-  // chuẩn hóa data thành từng hàng gồm 5 item
+  // normalize retrieval into rows of 5
   const rows = [];
   for (let i = 0; i < retrival.length; i += 5) {
     rows.push(retrival.slice(i, i + 5));
   }
 
-  // columns động: 5 cột
+  // columns dynamic: 5 columns
   const columns = Array.from({ length: 5 }, (_, idx) => ({
     title: `Item ${idx + 1}`,
     dataIndex: idx,
     key: idx,
-    render: (item) =>
-      item ? (
+    render: (item) => {
+      if (!item) return null;
+
+      // Normalize different possible shapes:
+      // - string path: "keyframes/..."
+      // - object: { path: "...", L: "21", V: "001", frame_id: 26, ... }
+      // - sometimes backend might return absolute url in path
+      const isString = typeof item === "string";
+      let pathVal = isString ? item : (item.path || item.url || item.path_full || item.src || "");
+      // If item is something like { idx: 123 } and metadata path missing, we can't render image
+      // pathVal could also accidentally be an object; coerce to string
+      if (pathVal && typeof pathVal !== "string") pathVal = String(pathVal);
+
+      const imageUrl = pathVal
+        ? (pathVal.startsWith("http://") || pathVal.startsWith("https://")
+          ? pathVal
+          : `http://localhost:8080/${pathVal.replace(/^\/+/, '')}`)
+        : null;
+
+      // metadata fields
+      const L = !isString && item && item.L ? item.L : "";
+      const V = !isString && item && item.V ? item.V : "";
+      const frame_id = !isString && item && item.frame_id ? item.frame_id : (pathVal ? pathVal.split('/').pop() : "");
+
+      return (
         <div style={{ textAlign: "center" }}>
-          <img
-            src={`http://localhost:8080/${item.path}`} // đường dẫn ảnh
-            alt={`frame-${item.frame_id}`}
-            style={{ width: 300, height: 150, objectFit: "cover" }}
-          />
-          <div>{`L: ${item.L} - V: ${item.V} - ${item.frame_id}`}</div>
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={`frame-${frame_id}`}
+              style={{ width: 300, height: 150, objectFit: "cover" }}
+              onError={(e) => { e.currentTarget.src = ""; }}
+            />
+          ) : (
+            <div style={{ width: 300, height: 150, display: "flex", alignItems: "center", justifyContent: "center", background: "#f0f0f0" }}>
+              No preview
+            </div>
+          )}
+          <div>{`L: ${L}${V ? " - V: " + V : ""} ${frame_id ? "- " + frame_id : ""}`}</div>
         </div>
-      ) : null,
+      );
+    }
   }));
 
   const dataSource = rows.map((row, index) => {
@@ -176,68 +155,125 @@ function Jobs() {
     });
     return obj;
   });
-  const [detection, setDetection] = useState(""); // detection từ DropArea
 
-  // Gom object mỗi khi thay đổi
-
-
-
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newjob = { name, des, code, isActive, isDeleted };
-
+  // Helper to call backend and normalize response
+  const doSearch = async (payload) => {
     try {
+      console.log("Sending search payload:", payload);
+      const resp = await search(payload);
 
+      // normalize possible response locations
+      const data = resp?.data ?? {};
+      console.log("Raw server response:", data);
 
-      const response = await addjobs(newjob);
-      console.log(response.data);
-      alert('job created !')
+      // Prefer 'paths', fallback to 'data.paths', 'result', or top-level array
+      let result = data.paths ?? data.result ?? data.data ?? data;
 
+      // If result is object that contains paths
+      if (result && typeof result === 'object' && !Array.isArray(result)) {
+        // maybe structure { paths: [...], topk: [...] }
+        if (Array.isArray(result.paths)) {
+          result = result.paths;
+        } else if (Array.isArray(data.paths)) {
+          result = data.paths;
+        } else if (Array.isArray(data.topk)) {
+          // sometimes topk is indices; then we can't build paths
+          result = [];
+        } else {
+          // not an array -> unknown; try to find any array inside
+          const foundArray = Object.values(result).find(v => Array.isArray(v));
+          result = foundArray ?? [];
+        }
+      }
 
+      if (!Array.isArray(result)) {
+        // try resp.data directly if it's array
+        if (Array.isArray(resp?.data)) {
+          result = resp.data;
+        } else {
+          result = [];
+        }
+      }
+
+      // Normalize each entry to object with 'path' if necessary
+      const normalized = result.map(r => {
+        if (!r) return null;
+        if (typeof r === "string") {
+          return { path: r };
+        } else if (typeof r === "object") {
+          // If r contains only path-like string keys, keep as-is
+          return r;
+        } else {
+          return null;
+        }
+      }).filter(Boolean);
+
+      console.log("Normalized result count:", normalized.length, normalized.slice(0, 3));
+      setRetrival(normalized);
+      return normalized;
     } catch (err) {
-
-      console.error("Signup failed:", err.response?.data || err.message);
-
-
+      console.error("Search failed:", err?.response?.data ?? err.message ?? err);
+      setRetrival([]);
+      return [];
     }
-  }
+  };
+
+  // Handler for the search button(s)
+  const handleSearchClick = async (withScreens = false) => {
+    // ensure topk is a number
+    const kNum = Number(topk) || 100;
+
+    const basePayload = {
+      k: kNum,
+      detection: detection || "",
+      objects: obj || "",
+      device: "cpu",
+      operator: logic || "AND",
+      page: 1,
+      page_size: pageSize || 10,
+      text: text || "",
+      augment: false
+    };
+
+    const payload = withScreens ? {
+      ...basePayload,
+      query1: screen1 || undefined,
+      query2: screen2 || undefined,
+      query3: screen3 || undefined,
+      model: model || "beit3",
+      k: kNum,
+      device: "cpu",
+      page: 1,
+      page_size: pageSize || 10
+    } : basePayload;
+
+    await doSearch(payload);
+  };
 
   return (
     <>
       <div style={{ display: 'flex' }}>
-        {/*bắt đầu drawer ant design */}
-
-
+        {/* Sidebar Drawer */}
         <Drawer
           title={<h2 style={{ margin: 0, fontFamily: "sans-serif" }}>Advanced Searching</h2>}
-          placement="right"
+          placement="left"
           onClose={closeDrawer}
           open={drawerOpen}
-          width={360}                 // chỉnh số px nếu cần (hoặc dùng '23vw')
-          mask={false}                // không che overlay — giống sidebar
-          closable={true}             // hiện nút đóng (x)
+          width={360}
+          mask={false}
+          closable={true}
           bodyStyle={{ padding: 20 }}
           style={{ height: "100vh", overflow: "hidden" }}
-          getContainer={false}        // render inline trong DOM của component (tùy ý)
+          getContainer={false}
         >
-          <div
-            style={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              overflowY: "auto",
-              background: "#fff",
-            }}
-          >
-          
-            {/* <div className='header' style={{ borderBottom: "1px solid #d9d9d9", paddingBottom: 8 }}>
-        <h1 style={{ fontFamily: 'sans-serif', margin: 0 }}>Advanced Searching</h1>
-      </div> */}
-
-            {/* Nội dung cũ của bạn (giữ nguyên) */}
+          <div style={{
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+            overflowY: "auto",
+            background: "#fff",
+          }}>
             <ItemPalette items={availableItems} />
 
             <div style={{ display: "flex", flexDirection: "column" }}>
@@ -279,125 +315,66 @@ function Jobs() {
               onChange={(e) => setText(e.target.value)}
             />
           </div>
+
+          <Button onClick={async (e) => { e.preventDefault(); await handleSearchClick(false); }} title="Activate advanced searching">
+            <MdManageSearch size={20} />
+          </Button>
         </Drawer>
-        {/*kết thúc drawer*/}
+
+        {/* Main area */}
         <div style={{ width: '100%', paddingLeft: '10px' }}>
           <div style={{ width: '100%', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 
-
-
             <Input
-              style={{ width: '35%' }}
+              style={{ width: '25%' }}
               placeholder='Screen 1'
               value={screen1}
-              onChange={(e) => {
-                setScreen1(e.target.value);
-                console.log("Screen1:", e.target.value);
-              }}
+              onChange={(e) => setScreen1(e.target.value)}
             />
 
             <Input
-              style={{ width: '35%' }}
+              style={{ width: '25%' }}
               placeholder='Screen 2'
               value={screen2}
-              onChange={(e) => {
-                setScreen2(e.target.value);
-                console.log("Screen2:", e.target.value);
-              }}
+              onChange={(e) => setScreen2(e.target.value)}
             />
+
             <Input
-              style={{ width: '10%' }}
+              style={{ width: '25%' }}
+              placeholder='Screen 3'
+              value={screen3}
+              onChange={(e) => setScreen3(e.target.value)}
+            />
+
+            <Input
+              style={{ width: '5%' }}
               placeholder='set top-K'
               value={topk}
               onChange={(e) => {
-                setTopk(e.target.value);
-                console.log("Topk: ", e.target.value);
+                const v = e.target.value;
+                const n = Number(v);
+                setTopk(Number.isNaN(n) ? v : n);
               }}
             />
+
             <Select
-              style={{ width: '10%' }}
+              style={{ width: '8%' }}
               value={model}
               onChange={(value) => setModel(value)}
             >
               <Option value="beit3">beit3</Option>
               <Option value="clip">clip</Option>
             </Select>
-           
-            <Button onClick={async (e) => {
-              e.preventDefault();
 
-
-              if (screen1 === "" && screen2 === "") {
-                const searchObject = {
-                  k: topk,
-                  detection: detection,
-                  objects: obj,
-                  device: "cpu",
-                  operator: logic,
-                  page: 1,
-                  page_size: 10,
-                  model: model,
-                  augment: false
-                }
-                console.log("Search Object:", searchObject);
-                try {
-
-                  const respone = await search(searchObject)
-                  const result = respone.data
-                  setRetrival(result)
-                  console.log(result)
-                } catch (err) {
-                  console.error("Signup failed:", err.response?.data || err.message);
-
-                }
-
-              } else {
-                const searchObject = {
-                  query1: screen1,
-                  query2: screen2,
-                  model: model,
-                  k: topk,
-                  augment: false,
-                  detection: detection,   // lấy từ DropArea
-                  objects: obj,
-                  device: "cpu",
-                  operator: logic,
-                  page: 1,
-                  page_size: 10
-                };
-                console.log("Search Object:", searchObject);
-                try {
-
-                  const respone = await search(searchObject)
-                  const result = respone.data.paths
-                  setRetrival(result)
-                  console.log(result)
-                } catch (err) {
-                  console.error("Signup failed:", err.response?.data || err.message);
-
-                }
-
-              }
-
-
-
-            }} title="Activate advanced searching">
-             
+            <Button onClick={async (e) => { e.preventDefault(); await handleSearchClick(screen1 !== "" || screen2 !== ""); }} title="Activate advanced searching">
               <MdManageSearch size={20} />
-
             </Button>
-             <Button
-              type="text"
-              onClick={openDrawer}
-              style={{}}
-              icon={<MenuOutlined />}
-            />
 
+            <Button type="text" onClick={openDrawer} icon={<MenuOutlined />} />
 
           </div>
 
-          <div>
-            {/*trong retrival có bao nhiêu item thì hiển thị 5 item 1 hàng, nội dung của từng cột sẽ là ảnh 120X60 lấy từ path của mỗi item, phía dưới mỗi ảnh sẽ để L - V*/}
+          <div style={{ marginTop: 12 }}>
             <Table
               style={{ width: "100%", margin: "0" }}
               dataSource={dataSource}
@@ -412,25 +389,10 @@ function Jobs() {
                 },
               }}
             />
-
           </div>
-
         </div>
       </div>
-
-
-
-
-
-
-
-
-
-
     </>
-
-
-
   )
 }
 

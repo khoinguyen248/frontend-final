@@ -13,7 +13,8 @@ export default function DropArea({ droppedItems, onDrop, onRemove , onStateChang
   };
 
   // Gom nhóm thành string mong muốn
-  const groupedString = Object.values(
+  const groupedString =  
+  Object.values(
     objectState.reduce((acc, item) => {
       if (!acc[item.label]) acc[item.label] = [];
       acc[item.label].push(item.key);
@@ -21,7 +22,7 @@ export default function DropArea({ droppedItems, onDrop, onRemove , onStateChang
     }, {})
   )
     .map((arr) => arr.join(" "))
-    .join(" ");
+    .join(", ") 
 
 
 
