@@ -9,6 +9,7 @@ import DropArea from './DropArea';
 import { search } from './api';
 import { Option } from 'antd/es/mentions';
 import { MenuOutlined } from "@ant-design/icons";
+import { CiLink } from "react-icons/ci";
 
 function Jobs() {
   const [drawerOpen, setDrawerOpen] = useState(true); // mở mặc định
@@ -64,7 +65,7 @@ function Jobs() {
   ];
 
   // UI state
-  const [status, setStatus] = useState("enabled");
+  const [status, setStatus] = useState(false);
   const [logic, setLogic] = useState("AND");
   const [text, setText] = useState("")
   const [droppedItems, setDroppedItems] = useState([]);
@@ -74,7 +75,8 @@ function Jobs() {
   const [screen1, setScreen1] = useState("");
   const [screen2, setScreen2] = useState("");
    const [screen3, setScreen3] = useState("");
-
+   const [buttonflag, setButtonflag] = useState(false)
+  
   const [obj, setObj] = useState("")
   const [model, setModel] = useState("beit3")
   const [topk, setTopk] = useState(100)
@@ -127,6 +129,10 @@ function Jobs() {
       const L = !isString && item && item.L ? item.L : "";
       const V = !isString && item && item.V ? item.V : "";
       const frame_id = !isString && item && item.frame_id ? item.frame_id : (pathVal ? pathVal.split('/').pop() : "");
+      const url = item.video_url
+      const time = item.frame_stamp
+      let minute = Math.floor(time / 60)
+      let sec  = time%60
 
       return (
         <div style={{ textAlign: "center" }}>
@@ -142,7 +148,11 @@ function Jobs() {
               No preview
             </div>
           )}
-          <div>{`L: ${L}${V ? " - V: " + V : ""} ${frame_id ? "- " + frame_id : ""}`}</div>
+          <div>{`L: ${L}${V ? " - V: " + V : ""} ${frame_id ? "- " + frame_id : ""} - ${minute}m${sec}s `}  <a href={`${url}`} target="_blank" 
+  rel="noopener noreferrer"><CiLink/></a></div>
+          
+        
+        
         </div>
       );
     }
@@ -163,6 +173,7 @@ function Jobs() {
       const resp = await search(payload);
 
       // normalize possible response locations
+      console.log(resp)
       const data = resp?.data ?? {};
       console.log("Raw server response:", data);
 
@@ -231,8 +242,8 @@ function Jobs() {
       operator: logic || "AND",
       page: 1,
       page_size: pageSize || 10,
-      text: text || "",
-      augment: false
+      text: text || ""
+     
     };
 
     const payload = withScreens ? {
@@ -243,6 +254,7 @@ function Jobs() {
       model: model || "beit3",
       k: kNum,
       device: "cpu",
+      augment:status,
       page: 1,
       page_size: pageSize || 10
     } : basePayload;
@@ -277,12 +289,7 @@ function Jobs() {
             <ItemPalette items={availableItems} />
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <Radio.Group onChange={(e) => setStatus(e.target.value)} value={status}>
-                <Space>
-                  <Radio value="enabled">Enabled</Radio>
-                  <Radio value="disabled">Disabled</Radio>
-                </Space>
-              </Radio.Group>
+              
 
               <div style={{ marginTop: 8 }}>
                 <Radio.Group onChange={(e) => setLogic(e.target.value)} value={logic}>
@@ -316,9 +323,6 @@ function Jobs() {
             />
           </div>
 
-          <Button onClick={async (e) => { e.preventDefault(); await handleSearchClick(false); }} title="Activate advanced searching">
-            <MdManageSearch size={20} />
-          </Button>
         </Drawer>
 
         {/* Main area */}
@@ -358,23 +362,29 @@ function Jobs() {
             />
 
             <Select
-              style={{ width: '8%' }}
+              style={{ width: '6%' }}
               value={model}
               onChange={(value) => setModel(value)}
             >
-              <Option value="beit3">beit3</Option>
-              <Option value="clip">clip</Option>
+              <Option value="beit3">BEIT3</Option>
+              <Option value="clip">CLIP</Option>
             </Select>
+           
 
             <Button onClick={async (e) => { e.preventDefault(); await handleSearchClick(screen1 !== "" || screen2 !== ""); }} title="Activate advanced searching">
               <MdManageSearch size={20} />
             </Button>
 
             <Button type="text" onClick={openDrawer} icon={<MenuOutlined />} />
+            <Button onClick={() => {
+              setButtonflag(!buttonflag)
+              setStatus(!status)
+            }} style={buttonflag === false ? {color:'white', backgroundColor:'red'} : {color:'white', backgroundColor:'green'}} >{buttonflag === false ? `Off` : `On`}</Button>
 
           </div>
 
           <div style={{ marginTop: 12 }}>
+            {retrival.length > 0 ? <>
             <Table
               style={{ width: "100%", margin: "0" }}
               dataSource={dataSource}
@@ -389,6 +399,19 @@ function Jobs() {
                 },
               }}
             />
+            
+            </> : <>
+            <div style={{fontFamily:'Lexend', width:'100%', display:'flex', flexDirection:"column", alignItems:'center', height:'600px', justifyContent:'center'}}>
+
+               <h1 style={{fontSize:'65px'}}>EEIOT HCMUT</h1>
+               <h2 style={{fontSize:'45px', color:'grey'}}>AIC 2025</h2>
+
+            </div>
+           
+             
+            
+            </>}
+           
           </div>
         </div>
       </div>
