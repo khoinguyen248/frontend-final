@@ -10,6 +10,7 @@ const API = axios.create({
 
 
 export const search = (data2) => API.post('/search/collection', data2)
+export const searchinfo = (data3) => API.post('/search/infoframes', data3)
 
 /*
 export const signup = (data) => API.post('/account/signup', data)

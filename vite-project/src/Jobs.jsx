@@ -10,6 +10,8 @@ import { search } from './api';
 import { Option } from 'antd/es/mentions';
 import { MenuOutlined } from "@ant-design/icons";
 import { CiLink } from "react-icons/ci";
+import Infor from './Infor';
+import { FaFolderOpen } from "react-icons/fa";
 
 function Jobs() {
   const [drawerOpen, setDrawerOpen] = useState(true); // mở mặc định
@@ -76,7 +78,11 @@ function Jobs() {
   const [screen2, setScreen2] = useState("");
    const [screen3, setScreen3] = useState("");
    const [buttonflag, setButtonflag] = useState(false)
-  
+
+const [selectedFrame, setSelectedFrame] = useState(null);
+
+   const[mondalFLag, setModalFlag] = useState(false)
+
   const [obj, setObj] = useState("")
   const [model, setModel] = useState("beit3")
   const [topk, setTopk] = useState(100)
@@ -151,6 +157,16 @@ function Jobs() {
           )}
           <div>{`${parseInt(L) <= 20 ? "K" : "L"}: ${L}${V ? " - V: " + V : ""} ${frame_id ? "- " + frame_id : ""} - ${minute}m${sec.toFixed(0)}s `}  <a href={`${url}&t=${time}s`} target="_blank" 
   rel="noopener noreferrer"><CiLink/></a></div>
+<FaFolderOpen onClick={() => {
+  setModalFlag(true);
+  setSelectedFrame({
+    idx: item.idx,
+    L: item.L,
+    V: item.V
+  });
+}} />
+
+
           
         
         
@@ -416,6 +432,15 @@ function Jobs() {
           </div>
         </div>
       </div>
+
+{mondalFLag && (
+  <Infor 
+    setModalFlag={setModalFlag} 
+    
+    selectedFrame={selectedFrame} 
+  />
+)}
+
     </>
   )
 }
