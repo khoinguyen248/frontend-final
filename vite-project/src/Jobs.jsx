@@ -76,12 +76,13 @@ function Jobs() {
   const [pageSize, setPageSize] = useState(10)
   const [screen1, setScreen1] = useState("");
   const [screen2, setScreen2] = useState("");
-   const [screen3, setScreen3] = useState("");
-   const [buttonflag, setButtonflag] = useState(false)
+  const [screen3, setScreen3] = useState("");
+  const [buttonflag, setButtonflag] = useState(false)
+  const [tempFuzzy, setTempFuzzy] = useState(-1)
 
-const [selectedFrame, setSelectedFrame] = useState(null);
+  const [selectedFrame, setSelectedFrame] = useState(null);
 
-   const[mondalFLag, setModalFlag] = useState(false)
+  const [mondalFLag, setModalFlag] = useState(false)
 
   const [obj, setObj] = useState("")
   const [model, setModel] = useState("beit3")
@@ -139,7 +140,7 @@ const [selectedFrame, setSelectedFrame] = useState(null);
       const time = item.frame_stamp
       const mathfloor = Math.floor(time)
       let minute = Math.floor(time / 60)
-      let sec  = (time-60*minute)
+      let sec = (time - 60 * minute)
 
       return (
         <div style={{ textAlign: "center" }}>
@@ -155,21 +156,21 @@ const [selectedFrame, setSelectedFrame] = useState(null);
               No preview
             </div>
           )}
-          <div>{`${parseInt(L) <= 20 ? "K" : "L"}: ${L}${V ? " - V: " + V : ""} ${frame_id ? "- " + frame_id : ""} - ${minute}m${sec.toFixed(0)}s `}  <a href={`${url}&t=${time}s`} target="_blank" 
-  rel="noopener noreferrer"><CiLink/></a></div>
-<FaFolderOpen onClick={() => {
-  setModalFlag(true);
-  setSelectedFrame({
-    idx: item.idx,
-    L: item.L,
-    V: item.V
-  });
-}} />
+          <div>{`${parseInt(L) <= 20 ? "K" : "L"}: ${L}${V ? " - V: " + V : ""} ${frame_id ? "- " + frame_id : ""} - ${minute}m${sec.toFixed(0)}s `}  <a href={`${url}&t=${time}s`} target="_blank"
+            rel="noopener noreferrer"><CiLink /></a></div>
+          <FaFolderOpen onClick={() => {
+            setModalFlag(true);
+            setSelectedFrame({
+              idx: item.idx,
+              L: item.L,
+              V: item.V
+            });
+          }} />
 
 
-          
-        
-        
+
+
+
         </div>
       );
     }
@@ -259,8 +260,9 @@ const [selectedFrame, setSelectedFrame] = useState(null);
       operator: logic || "AND",
       page: 1,
       page_size: pageSize || 10,
-      text: text || ""
-     
+      text: text || "",
+      temporal_fuzzy: tempFuzzy || -1
+
     };
 
     const payload = withScreens ? {
@@ -271,9 +273,10 @@ const [selectedFrame, setSelectedFrame] = useState(null);
       model: model || "beit3",
       k: kNum,
       device: "cpu",
-      augment:status,
+      augment: status,
       page: 1,
-      page_size: pageSize || 10
+      page_size: pageSize || 10,
+      temporal_fuzzy: tempFuzzy || -1
     } : basePayload;
 
     await doSearch(payload);
@@ -306,7 +309,7 @@ const [selectedFrame, setSelectedFrame] = useState(null);
             <ItemPalette items={availableItems} />
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              
+
 
               <div style={{ marginTop: 8 }}>
                 <Radio.Group onChange={(e) => setLogic(e.target.value)} value={logic}>
@@ -338,6 +341,19 @@ const [selectedFrame, setSelectedFrame] = useState(null);
               value={text}
               onChange={(e) => setText(e.target.value)}
             />
+
+            <Select
+              style={{ width: '20%' }}
+              value={tempFuzzy}
+              onChange={(value) => setTempFuzzy(value)}
+            >
+              <Option value={-1}>-1</Option>
+              <Option value={1}>1</Option>
+              <Option value={2}>2</Option>
+
+              <Option value={3}>3</Option>
+
+            </Select>
           </div>
 
         </Drawer>
@@ -386,7 +402,7 @@ const [selectedFrame, setSelectedFrame] = useState(null);
               <Option value="beit3">BEIT3</Option>
               <Option value="clip">CLIP</Option>
             </Select>
-           
+
 
             <Button onClick={async (e) => { e.preventDefault(); await handleSearchClick(screen1 !== "" || screen2 !== ""); }} title="Activate advanced searching">
               <MdManageSearch size={20} />
@@ -396,50 +412,50 @@ const [selectedFrame, setSelectedFrame] = useState(null);
             <Button onClick={() => {
               setButtonflag(!buttonflag)
               setStatus(!status)
-            }} style={buttonflag === false ? {color:'white', backgroundColor:'red'} : {color:'white', backgroundColor:'green'}} >{buttonflag === false ? `Off` : `On`}</Button>
+            }} style={buttonflag === false ? { color: 'white', backgroundColor: 'red' } : { color: 'white', backgroundColor: 'green' }} >{buttonflag === false ? `Off` : `On`}</Button>
 
           </div>
 
           <div style={{ marginTop: 12 }}>
             {retrival.length > 0 ? <>
-            <Table
-              style={{ width: "100%", margin: "0" }}
-              dataSource={dataSource}
-              columns={columns}
-              pagination={{
-                current: page,
-                pageSize: pageSize,
-                showSizeChanger: true,
-                onChange: (page, pageSize) => {
-                  setPage(page);
-                  setPageSize(pageSize);
-                },
-              }}
-            />
-            
+              <Table
+                style={{ width: "100%", margin: "0" }}
+                dataSource={dataSource}
+                columns={columns}
+                pagination={{
+                  current: page,
+                  pageSize: pageSize,
+                  showSizeChanger: true,
+                  onChange: (page, pageSize) => {
+                    setPage(page);
+                    setPageSize(pageSize);
+                  },
+                }}
+              />
+
             </> : <>
-            <div style={{fontFamily:'Lexend', width:'100%', display:'flex', flexDirection:"column", alignItems:'center', height:'600px', justifyContent:'center'}}>
+              <div style={{ fontFamily: 'Lexend', width: '100%', display: 'flex', flexDirection: "column", alignItems: 'center', height: '600px', justifyContent: 'center' }}>
 
-               <h1 style={{fontSize:'65px'}}>EEIOT HCMUT</h1>
-               <h2 style={{fontSize:'45px', color:'grey'}}>AIC 2025</h2>
+                <h1 style={{ fontSize: '65px' }}>EEIOT HCMUT</h1>
+                <h2 style={{ fontSize: '45px', color: 'grey' }}>AIC 2025</h2>
 
-            </div>
-           
-             
-            
+              </div>
+
+
+
             </>}
-           
+
           </div>
         </div>
       </div>
 
-{mondalFLag && (
-  <Infor 
-    setModalFlag={setModalFlag} 
-    
-    selectedFrame={selectedFrame} 
-  />
-)}
+      {mondalFLag && (
+        <Infor
+          setModalFlag={setModalFlag}
+
+          selectedFrame={selectedFrame}
+        />
+      )}
 
     </>
   )
