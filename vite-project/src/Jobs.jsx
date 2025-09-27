@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react'
 import { MdManageSearch } from "react-icons/md";
 import { Select, Space } from "antd";
+import { FaCirclePlay } from "react-icons/fa6";
+
 import './App.css'
 import { Table, Button, Drawer, Form, Radio, Input } from 'antd'
 import ItemPalette from './ItemPalette';
@@ -12,14 +14,18 @@ import { MenuOutlined } from "@ant-design/icons";
 import { CiLink } from "react-icons/ci";
 import Infor from './Infor';
 import { FaFolderOpen } from "react-icons/fa";
+import { AiFillBulb } from "react-icons/ai";
+import YoutubePlayer from './YoutubePlayer.jsx';
 
 function Jobs() {
   const [drawerOpen, setDrawerOpen] = useState(true); // mở mặc định
   const openDrawer = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
 
+
   // palette items
   const availableItems = [
+    // Đã có sẵn
     { id: 'person', label: 'person', icon: '👤' },
     { id: 'man', label: 'man', icon: '👨' },
     { id: 'woman', label: 'woman', icon: '👩' },
@@ -32,11 +38,9 @@ function Jobs() {
     { id: 'airplane', label: 'airplane', icon: '✈️' },
     { id: 'cat', label: 'cat', icon: '🐱' },
     { id: 'dog', label: 'dog', icon: '🐶' },
-    { id: 'cow', label: 'cow', icon: '🐄' },
     { id: 'bird', label: 'bird', icon: '🐦' },
     { id: 'umbrella', label: 'umbrella', icon: '☂️' },
     { id: 'chair', label: 'chair', icon: '🪑' },
-    { id: 'tv', label: 'tv', icon: '📺' },
     { id: 'laptop', label: 'laptop', icon: '💻' },
     { id: 'house', label: 'house', icon: '🏠' },
     { id: 'cell_phone', label: 'cell_phone', icon: '📱' },
@@ -52,6 +56,40 @@ function Jobs() {
     { id: 'couch', label: 'couch', icon: '🛋️' },
 
     // Colors
+
+    { id: 'athlete', label: 'athlete', icon: '🏃' },
+    { id: 'sofa', label: 'sofa', icon: '🛋️' },
+    { id: 'clock', label: 'clock', icon: '⏰' },
+    { id: 'clothing', label: 'clothing', icon: '👕' },
+    { id: 'cup', label: 'cup', icon: '☕' },
+    { id: 'dessert', label: 'dessert', icon: '🍨' },
+    { id: 'display', label: 'display', icon: '🖥️' },
+    { id: 'elephant', label: 'elephant', icon: '🐘' },
+    { id: 'fish', label: 'fish', icon: '🐟' },
+    { id: 'footwear', label: 'footwear', icon: '👟' },
+    { id: 'jellyfish', label: 'jellyfish', icon: '🎐' }, // tạm thay thế
+    { id: 'keyboard', label: 'keyboard', icon: '⌨️' },
+    { id: 'light', label: 'light', icon: '💡' },
+    { id: 'marine_invertebrates', label: 'marine_invertebrates', icon: '🦑' },
+    { id: 'musical', label: 'musical', icon: '🎵' },
+    { id: 'musician', label: 'musician', icon: '🎸' },
+    { id: 'parachute', label: 'parachute', icon: '🪂' },
+    { id: 'plant', label: 'plant', icon: '🌱' },
+    { id: 'rays_and_skates', label: 'rays_and_skates', icon: '🌊' },
+    { id: 'shark', label: 'shark', icon: '🦈' },
+    { id: 'sheep', label: 'sheep', icon: '🐑' },
+    { id: 'singer', label: 'singer', icon: '🎤' },
+    { id: 'skateboard', label: 'skateboard', icon: '🛹' },
+    { id: 'sports', label: 'sports', icon: '🎾' },
+    { id: 'television', label: 'television', icon: '📺' },
+    { id: 'tie', label: 'tie', icon: '👔' },
+    { id: 'turtle', label: 'turtle', icon: '🐢' },
+    { id: 'vehicle', label: 'vehicle', icon: '🚌' },
+    { id: 'wet_suit', label: 'wet_suit', icon: '🤿' },
+    { id: 'whale', label: 'whale', icon: '🐋' },
+    { id: 'strap', label: 'strap', icon: '⛓️' },
+    { id: 'teddy', label: 'teddy', icon: '🧸' },
+    { id: 'wine_glass', label: 'wine_glass', icon: '🍷' },
     { id: 'black', label: 'black', icon: '⚫' },
     { id: 'white', label: 'white', icon: '⚪' },
     { id: 'red', label: 'red', icon: '🔴' },
@@ -63,8 +101,10 @@ function Jobs() {
     { id: 'pink', label: 'pink', icon: '🌸' },
     { id: 'orange', label: 'orange', icon: '🟠' },
     { id: 'gray', label: 'gray', icon: '⚙️' },
-    { id: 'traffic_sign', label: 'traffic_sign', icon: '🚸' }
+    { id: 'traffic_sign', label: 'traffic_sign', icon: '🚸' },
+
   ];
+
 
   // UI state
   const [status, setStatus] = useState(false);
@@ -79,10 +119,13 @@ function Jobs() {
   const [screen3, setScreen3] = useState("");
   const [buttonflag, setButtonflag] = useState(false)
   const [tempFuzzy, setTempFuzzy] = useState(-1)
+  const [lang, setLang] = useState("Eng")
 
   const [selectedFrame, setSelectedFrame] = useState(null);
 
   const [mondalFLag, setModalFlag] = useState(false)
+  const [vidFlag, setVidFlag] = useState('')
+  const [ytflag, setYtflag] = useState(false)
 
   const [obj, setObj] = useState("")
   const [model, setModel] = useState("beit3")
@@ -166,6 +209,14 @@ function Jobs() {
               L: item.L,
               V: item.V
             });
+          }} />
+          <FaCirclePlay onClick={() => {
+            let newUrl = `${url}&t=${Math.floor(time)}`; // Bỏ chữ 's'
+
+           
+            setVidFlag(newUrl);
+            console.log("Setting vidFlag:", newUrl);
+            setYtflag(true);
           }} />
 
 
@@ -262,7 +313,8 @@ function Jobs() {
       page: 1,
       page_size: pageSize || 10,
       text: text || "",
-      temporal_fuzzy: tempFuzzy || -1
+      temporal_fuzzy: tempFuzzy || -1,
+      language: lang
 
     };
 
@@ -285,7 +337,7 @@ function Jobs() {
 
   return (
     <>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', width: '100%', overflow: 'none' }}>
         {/* Sidebar Drawer */}
         <Drawer
           title={<h2 style={{ margin: 0, fontFamily: "sans-serif" }}>Advanced Searching</h2>}
@@ -296,7 +348,7 @@ function Jobs() {
           mask={false}
           closable={true}
           bodyStyle={{ padding: 20 }}
-          style={{ height: "100vh", overflow: "hidden" }}
+          style={{ height: "108vh", overflow: "hidden" }}
           getContainer={false}
         >
           <div style={{
@@ -331,14 +383,14 @@ function Jobs() {
 
             <Input
               style={{ width: "93%" }}
-              placeholder="Object fillin"
+              placeholder="Object fillin (ex: car1, car2)"
               value={obj}
               onChange={(e) => setObj(e.target.value)}
             />
 
             <Input
               style={{ width: "93%" }}
-              placeholder="Text indicator"
+              placeholder="Text indicator ( ex: apple )"
               value={text}
               onChange={(e) => setText(e.target.value)}
             />
@@ -360,33 +412,108 @@ function Jobs() {
         </Drawer>
 
         {/* Main area */}
-        <div style={{ width: '100%', paddingLeft: '10px' }}>
-          <div style={{ width: '100%', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {/* Main area */}
+        <div style={{ width: '100%', fontFamily: 'Inter, sans-serif' }}>
 
+          {/* Search row */}
+          <div
+            style={{
+              width: '100%',
+              margin: 'auto',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '12px',
+              background: '#fff',
+
+              borderRadius: '10px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            }}
+          >
             <Input
-              style={{ width: '25%' }}
-              placeholder='Screen 1'
+              style={{ flex: 1, borderRadius: 8 }}
+              placeholder="Screen 1"
               value={screen1}
               onChange={(e) => setScreen1(e.target.value)}
             />
 
             <Input
-              style={{ width: '25%' }}
-              placeholder='Screen 2'
+              style={{ flex: 1, borderRadius: 8 }}
+              placeholder="Screen 2"
               value={screen2}
               onChange={(e) => setScreen2(e.target.value)}
             />
 
             <Input
-              style={{ width: '25%' }}
-              placeholder='Screen 3'
+              style={{ flex: 1, borderRadius: 8 }}
+              placeholder="Screen 3"
               value={screen3}
               onChange={(e) => setScreen3(e.target.value)}
             />
 
+            <Button
+              type="primary"
+              shape="circle"
+              onClick={async (e) => {
+                e.preventDefault();
+                await handleSearchClick(screen1 !== '' || screen2 !== '');
+              }}
+              title="Activate advanced searching"
+            >
+              <MdManageSearch size={18} />
+            </Button>
+
+            <Button
+              type="text"
+              onClick={openDrawer}
+              icon={<MenuOutlined />}
+              title="Advanced Searching"
+            />
+          </div>
+
+          {/* Settings row */}
+          <div
+            style={{
+              width: '100%',
+              marginTop: '16px',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              gap: '12px',
+              background: '#fff',
+
+              borderRadius: '10px',
+              boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+            }}
+          >
+            <Radio.Group onChange={(e) => setLang(e.target.value)} value={lang}>
+              <Space>
+                <Radio value="Vie">
+                  <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                    <img src={`/tran.png`} alt="" style={{ width: '16px', height: '16px' }} />
+                    <p>Translate</p>
+
+                  </div>
+                </Radio>
+
+              </Space>
+            </Radio.Group>
+
+            <Radio.Group onChange={(e) => setStatus(e.target.value)} value={status}>
+              <Space>
+                <Radio value={`${true}`}>
+                  <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+
+                    <p>Augment</p>
+
+                  </div>
+                </Radio>
+
+              </Space>
+            </Radio.Group>
             <Input
-              style={{ width: '5%' }}
-              placeholder='set top-K'
+              style={{ width: '120px', borderRadius: 8 }}
+              placeholder="set top-K"
               value={topk}
               onChange={(e) => {
                 const v = e.target.value;
@@ -396,7 +523,7 @@ function Jobs() {
             />
 
             <Select
-              style={{ width: '6%' }}
+              style={{ width: '130px' }}
               value={model}
               onChange={(value) => setModel(value)}
             >
@@ -405,22 +532,14 @@ function Jobs() {
             </Select>
 
 
-            <Button onClick={async (e) => { e.preventDefault(); await handleSearchClick(screen1 !== "" || screen2 !== ""); }} title="Activate advanced searching">
-              <MdManageSearch size={20} />
-            </Button>
-
-            <Button type="text" onClick={openDrawer} icon={<MenuOutlined />} />
-            <Button onClick={() => {
-              setButtonflag(!buttonflag)
-              setStatus(!status)
-            }} style={buttonflag === false ? { color: 'white', backgroundColor: 'red' } : { color: 'white', backgroundColor: 'green' }} >{buttonflag === false ? `Off` : `On`}</Button>
 
           </div>
 
-          <div style={{ marginTop: 12 }}>
-            {retrival.length > 0 ? <>
+          {/* Result area */}
+          <div style={{ marginTop: 20 }}>
+            {retrival.length > 0 ? (
               <Table
-                style={{ width: "100%", margin: "0" }}
+                style={{ width: '100%', margin: '0', background: '#fff' }}
                 dataSource={dataSource}
                 columns={columns}
                 pagination={{
@@ -433,21 +552,27 @@ function Jobs() {
                   },
                 }}
               />
-
-            </> : <>
-              <div style={{ fontFamily: 'Lexend', width: '100%', display: 'flex', flexDirection: "column", alignItems: 'center', height: '600px', justifyContent: 'center' }}>
-
-                <h1 style={{ fontSize: '65px' }}>EEIOT HCMUT</h1>
-                <h2 style={{ fontSize: '45px', color: 'grey' }}>AIC 2025</h2>
-
+            ) : (
+              <div
+                style={{
+                  fontFamily: 'Lexend, sans-serif',
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  height: '600px',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, #f0f2f5, #fafafa)',
+                  borderRadius: '12px',
+                }}
+              >
+                <h1 style={{ fontSize: '65px', margin: 0 }}>EEIOT HCMUT</h1>
+                <h2 style={{ fontSize: '40px', color: 'grey', margin: 0 }}>AIC 2025</h2>
               </div>
-
-
-
-            </>}
-
+            )}
           </div>
         </div>
+
       </div>
 
       {mondalFLag && (
@@ -455,6 +580,13 @@ function Jobs() {
           setModalFlag={setModalFlag}
 
           selectedFrame={selectedFrame}
+        />
+      )}
+      {ytflag && (
+        <YoutubePlayer
+          url={vidFlag}
+
+
         />
       )}
 

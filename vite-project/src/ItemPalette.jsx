@@ -25,8 +25,8 @@ export default function ItemPalette({ items }) {
               cursor: 'grab',
             }}
           >
-            <div title={item.label}>{item.icon}</div>
-            
+            {/* <div style={{height:'20px', width:'30px'}}>{`${item.icon}`}</div> */}
+           <img title={`${item.label}`} src={`/icons_img/${item.label}.png`} alt="" style={{width:'20px', height:'20px'}}/>
           </div>
         ))}
       </div>

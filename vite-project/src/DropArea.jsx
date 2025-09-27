@@ -41,7 +41,7 @@ export default function DropArea({ droppedItems, onDrop, onRemove , onStateChang
         gridTemplateRows: "repeat(7, 1fr)",
         gridTemplateColumns: "repeat(7, 1fr)",
         width: "280px",
-        height: "200px",
+        height: "300px",
         border: "2px solid black",
       }}
     >
@@ -84,7 +84,7 @@ export default function DropArea({ droppedItems, onDrop, onRemove , onStateChang
                 <span
                   title={`${colLabel}${row}${itemInCell.label}`}
                 >
-                  {itemInCell.icon}
+                   <img title={`${itemInCell.label}`} src={`/icons_img/${itemInCell.label}.png`} alt="" style={{width:'20px', height:'20px'}}/>
                 </span>
                 <button
                   onClick={() => {
