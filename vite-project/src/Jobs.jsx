@@ -211,7 +211,7 @@ function Jobs() {
             });
           }} />
           <FaCirclePlay onClick={() => {
-            let newUrl = `${url}&t=${Math.floor(time)}`; // Bỏ chữ 's'
+            let newUrl = `${url}&t=${time}s`; // Bỏ chữ 's'
 
            
             setVidFlag(newUrl);
@@ -586,7 +586,7 @@ function Jobs() {
         <YoutubePlayer
           url={vidFlag}
 
-
+           close={setYtflag}
         />
       )}
 
