@@ -1,7 +1,7 @@
 // Jobs.jsx
 import { useEffect, useState } from 'react'
 import { MdManageSearch } from "react-icons/md";
-import { Select, Space } from "antd";
+import { Checkbox, Select, Space } from "antd";
 import { FaCirclePlay } from "react-icons/fa6";
 
 import './App.css'
@@ -133,6 +133,7 @@ function Jobs() {
   const [retrival, setRetrival] = useState([]) // array of objects {path, L, V, frame_id, ...}
   const [detection, setDetection] = useState(""); // detection từ DropArea
 
+
   // Drop handlers
   const handleDrop = (item, position) => {
     setDroppedItems(prev => [...prev, { ...item, position }]);
@@ -213,7 +214,7 @@ function Jobs() {
           <FaCirclePlay onClick={() => {
             let newUrl = `${url}&t=${time}s`; // Bỏ chữ 's'
 
-           
+
             setVidFlag(newUrl);
             console.log("Setting vidFlag:", newUrl);
             setYtflag(true);
@@ -486,31 +487,22 @@ function Jobs() {
               boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
             }}
           >
-            <Radio.Group onChange={(e) => setLang(e.target.value)} value={lang}>
-              <Space>
-                <Radio value="Vie">
-                  <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                    <img src={`/tran.png`} alt="" style={{ width: '16px', height: '16px' }} />
-                    <p>Translate</p>
+            <Checkbox checked={lang} onChange={(e) => setLang(e.target.checked)}>
+              <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+                <img
+                  src={`/tran.png`}
+                  alt=""
+                  style={{ width: "16px", height: "16px" }}
+                />
+                <p>Translate</p>
+              </div>
+            </Checkbox>
 
-                  </div>
-                </Radio>
-
-              </Space>
-            </Radio.Group>
-
-            <Radio.Group onChange={(e) => setStatus(e.target.value)} value={status}>
-              <Space>
-                <Radio value={`${true}`}>
-                  <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-
-                    <p>Augment</p>
-
-                  </div>
-                </Radio>
-
-              </Space>
-            </Radio.Group>
+            <Checkbox checked={status} onChange={(e) => setStatus(e.target.checked)}>
+              <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+                <p>Augment</p>
+              </div>
+            </Checkbox>
             <Input
               style={{ width: '120px', borderRadius: 8 }}
               placeholder="set top-K"
@@ -586,7 +578,7 @@ function Jobs() {
         <YoutubePlayer
           url={vidFlag}
 
-           close={setYtflag}
+          close={setYtflag}
         />
       )}
 
