@@ -38,9 +38,11 @@ function Jobs() {
     { id: 'airplane', label: 'airplane', icon: '✈️' },
     { id: 'cat', label: 'cat', icon: '🐱' },
     { id: 'dog', label: 'dog', icon: '🐶' },
+    { id: 'cow', label: 'cow', icon: '🐄' },
     { id: 'bird', label: 'bird', icon: '🐦' },
     { id: 'umbrella', label: 'umbrella', icon: '☂️' },
     { id: 'chair', label: 'chair', icon: '🪑' },
+    { id: 'tv', label: 'tv', icon: '📺' },
     { id: 'laptop', label: 'laptop', icon: '💻' },
     { id: 'house', label: 'house', icon: '🏠' },
     { id: 'cell_phone', label: 'cell_phone', icon: '📱' },
@@ -54,42 +56,9 @@ function Jobs() {
     { id: 'sports_ball', label: 'sports_ball', icon: '⚽' },
     { id: 'bench', label: 'bench', icon: '🪑' },
     { id: 'couch', label: 'couch', icon: '🛋️' },
+    { id: 'traffic_sign', label: 'traffic_sign', icon: '🚸' },
 
     // Colors
-
-    { id: 'athlete', label: 'athlete', icon: '🏃' },
-    { id: 'sofa', label: 'sofa', icon: '🛋️' },
-    { id: 'clock', label: 'clock', icon: '⏰' },
-    { id: 'clothing', label: 'clothing', icon: '👕' },
-    { id: 'cup', label: 'cup', icon: '☕' },
-    { id: 'dessert', label: 'dessert', icon: '🍨' },
-    { id: 'display', label: 'display', icon: '🖥️' },
-    { id: 'elephant', label: 'elephant', icon: '🐘' },
-    { id: 'fish', label: 'fish', icon: '🐟' },
-    { id: 'footwear', label: 'footwear', icon: '👟' },
-    { id: 'jellyfish', label: 'jellyfish', icon: '🎐' }, // tạm thay thế
-    { id: 'keyboard', label: 'keyboard', icon: '⌨️' },
-    { id: 'light', label: 'light', icon: '💡' },
-    { id: 'marine_invertebrates', label: 'marine_invertebrates', icon: '🦑' },
-    { id: 'musical', label: 'musical', icon: '🎵' },
-    { id: 'musician', label: 'musician', icon: '🎸' },
-    { id: 'parachute', label: 'parachute', icon: '🪂' },
-    { id: 'plant', label: 'plant', icon: '🌱' },
-    { id: 'rays_and_skates', label: 'rays_and_skates', icon: '🌊' },
-    { id: 'shark', label: 'shark', icon: '🦈' },
-    { id: 'sheep', label: 'sheep', icon: '🐑' },
-    { id: 'singer', label: 'singer', icon: '🎤' },
-    { id: 'skateboard', label: 'skateboard', icon: '🛹' },
-    { id: 'sports', label: 'sports', icon: '🎾' },
-    { id: 'television', label: 'television', icon: '📺' },
-    { id: 'tie', label: 'tie', icon: '👔' },
-    { id: 'turtle', label: 'turtle', icon: '🐢' },
-    { id: 'vehicle', label: 'vehicle', icon: '🚌' },
-    { id: 'wet_suit', label: 'wet_suit', icon: '🤿' },
-    { id: 'whale', label: 'whale', icon: '🐋' },
-    { id: 'strap', label: 'strap', icon: '⛓️' },
-    { id: 'teddy', label: 'teddy', icon: '🧸' },
-    { id: 'wine_glass', label: 'wine_glass', icon: '🍷' },
     { id: 'black', label: 'black', icon: '⚫' },
     { id: 'white', label: 'white', icon: '⚪' },
     { id: 'red', label: 'red', icon: '🔴' },
@@ -100,8 +69,7 @@ function Jobs() {
     { id: 'purple', label: 'purple', icon: '🟣' },
     { id: 'pink', label: 'pink', icon: '🌸' },
     { id: 'orange', label: 'orange', icon: '🟠' },
-    { id: 'gray', label: 'gray', icon: '⚙️' },
-    { id: 'traffic_sign', label: 'traffic_sign', icon: '🚸' },
+    { id: 'gray', label: 'gray', icon: '⚙️' }
 
   ];
 
@@ -132,7 +100,6 @@ function Jobs() {
   const [topk, setTopk] = useState(100)
   const [retrival, setRetrival] = useState([]) // array of objects {path, L, V, frame_id, ...}
   const [detection, setDetection] = useState(""); // detection từ DropArea
-
 
   // Drop handlers
   const handleDrop = (item, position) => {
@@ -214,7 +181,7 @@ function Jobs() {
           <FaCirclePlay onClick={() => {
             let newUrl = `${url}&t=${time}s`; // Bỏ chữ 's'
 
-
+           
             setVidFlag(newUrl);
             console.log("Setting vidFlag:", newUrl);
             setYtflag(true);
@@ -578,7 +545,7 @@ function Jobs() {
         <YoutubePlayer
           url={vidFlag}
 
-          close={setYtflag}
+           close={setYtflag}
         />
       )}
 
