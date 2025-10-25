@@ -308,7 +308,7 @@ function Jobs() {
       <div style={{ display: 'flex', width: '100%', overflow: 'none' }}>
         {/* Sidebar Drawer */}
         <Drawer
-          title={<h2 style={{ margin: 0, fontFamily: "sans-serif" }}>Advanced Searching</h2>}
+          title={<h2 style={{ margin: 0, fontFamily: "sans-serif" }}>Metadata Search</h2>}
           placement="left"
           onClose={closeDrawer}
           open={drawerOpen}
@@ -454,7 +454,13 @@ function Jobs() {
               boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
             }}
           >
-            <Checkbox checked={lang} onChange={(e) => setLang(e.target.checked)}>
+            <Checkbox checked={lang} onChange={(e) => {
+              if(e.target.checked){
+                setLang(true)
+              }else{
+                setLang(false)
+              }
+            }}>
               <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
                 <img
                   src={`/tran.png`}
