@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { MdManageSearch } from "react-icons/md";
 import { Checkbox, Select, Space } from "antd";
 import { FaCirclePlay } from "react-icons/fa6";
+import { IoIosAddCircle } from "react-icons/io";
 
 import './App.css'
 import { Table, Button, Drawer, Form, Radio, Input } from 'antd'
@@ -16,12 +17,14 @@ import Infor from './Infor';
 import { FaFolderOpen } from "react-icons/fa";
 import { AiFillBulb } from "react-icons/ai";
 import YoutubePlayer from './YoutubePlayer.jsx';
+import Ansbox from './Ansbox.jsx';
+import Ansbox1 from './Ansbox1.jsx';
+import Ansbox2 from './Ansbox2.jsx';
 
 function Jobs() {
   const [drawerOpen, setDrawerOpen] = useState(true); // mở mặc định
   const openDrawer = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
-
 
   // palette items
   const availableItems = [
@@ -88,13 +91,14 @@ function Jobs() {
   const [buttonflag, setButtonflag] = useState(false)
   const [tempFuzzy, setTempFuzzy] = useState(-1)
   const [lang, setLang] = useState("Eng")
+  const [inf, setInf] = useState()
 
   const [selectedFrame, setSelectedFrame] = useState(null);
-
+  const [selectAns, setSelectAns] = useState("KIS")
   const [mondalFLag, setModalFlag] = useState(false)
   const [vidFlag, setVidFlag] = useState('')
   const [ytflag, setYtflag] = useState(false)
-
+  const [ansflag, setAnsflag] = useState(false)
   const [obj, setObj] = useState("")
   const [model, setModel] = useState("beit3")
   const [topk, setTopk] = useState(100)
@@ -149,10 +153,20 @@ function Jobs() {
       const frame_id = !isString && item && item.frame_id ? item.frame_id : (pathVal ? pathVal.split('/').pop() : "");
       const url = item.video_url
       const time = item.frame_stamp
+      const mstime = time * 1000
       const fps = item.fps
       const mathfloor = Math.floor(time)
       let minute = Math.floor(time / 60)
       let sec = (time - 60 * minute)
+      const infor = {
+        L: L,
+        V: V,
+        mstime: mstime,
+        frame_id: frame_id,
+        minute: minute,
+        sec: sec,
+        fps: fps
+      }
 
       return (
         <div style={{ textAlign: "center" }}>
@@ -175,16 +189,21 @@ function Jobs() {
             setSelectedFrame({
               idx: item.idx,
               L: item.L,
-              V: item.V
+              V: item.V,
+
             });
           }} />
           <FaCirclePlay onClick={() => {
             let newUrl = `${url}&t=${time}s`; // Bỏ chữ 's'
 
-           
+
             setVidFlag(newUrl);
             console.log("Setting vidFlag:", newUrl);
             setYtflag(true);
+          }} />
+          <IoIosAddCircle onClick={() => {
+            setAnsflag(true)
+            setInf(infor)
           }} />
 
 
@@ -455,9 +474,9 @@ function Jobs() {
             }}
           >
             <Checkbox checked={lang} onChange={(e) => {
-              if(e.target.checked){
+              if (e.target.checked) {
                 setLang(true)
-              }else{
+              } else {
                 setLang(false)
               }
             }}>
@@ -495,6 +514,19 @@ function Jobs() {
               <Option value="beit3">BEIT3</Option>
               <Option value="clip">CLIP</Option>
             </Select>
+
+
+            <Select
+              style={{ width: '130px' }}
+              value={selectAns}
+              onChange={(value) => setSelectAns(value)}
+            >
+              <Option value="kis">KIS</Option>
+              <Option value="qa">QA</Option>
+              <Option value="trake">TRAKE</Option>
+
+            </Select>
+
 
 
 
@@ -551,9 +583,13 @@ function Jobs() {
         <YoutubePlayer
           url={vidFlag}
 
-           close={setYtflag}
+          close={setYtflag}
         />
       )}
+      {selectAns == "kis" && ansflag == true && (<Ansbox close={setAnsflag} inf={inf} />)}
+      {selectAns == "qa" && ansflag == true && (<Ansbox1 close={setAnsflag} inf={inf} />)}
+
+      {selectAns == "trake" && ansflag == true && (<Ansbox2 close={setAnsflag} inf={inf} />)}
 
     </>
   )
