@@ -15,7 +15,7 @@ function Ansbox({ inf, close }) {
     }
         const infor = inf
 
-    const [med, setMed] = useState(`${parseInt(infor.L) <= 20 ? "K" : "L"}${infor.L}_V${infor.V}`)
+    const [med, setMed] = useState(`${parseInt(infor.L.slice(0,2)) <= 20 ? "K" : "L"}${infor.L.slice(0,2)}_V${infor.V}`)
     const [end, setEnd] = useState(`${infor.mstime}`)
 
     return (
@@ -27,12 +27,12 @@ function Ansbox({ inf, close }) {
                 >
                     Close
                 </Button>
-                <p>{`${parseInt(infor.L) <= 20 ? "K" : "L"}${infor.L}_V${infor.V}`}</p>
+                <p>{`${parseInt(infor.L.slice(0,2)) <= 20 ? "K" : "L"}${infor.L.slice(0,2)}_V${infor.V}`}</p>
                 <p>{`${infor.mstime}`}</p>
-                    <div>{`${parseInt(infor.L) <= 20 ? "K" : "L"}: ${infor.L}${infor.V ? " - V: " + infor.V : ""} ${infor.frame_id ? "- " +infor.frame_id : ""} - ${infor.minute}m${infor.sec.toFixed(0)}s ${infor.fps} `} </div>
+                    <div>{`${parseInt(infor.L.slice(0,2)) <= 20 ? "K" : "L"}: ${infor.L.slice(0,2)}${infor.V ? " - V: " + infor.V : ""} ${infor.frame_id ? "- " +infor.frame_id : ""} - ${infor.minute}m${infor.sec.toFixed(0)}s ${infor.fps} `} </div>
                 <Input
                     style={{ width: '320px', borderRadius: 8, marginBottom: '20px' }}
-                    placeholder="set mediaItemName"
+                    placeholder="Video_ID"
                     value={med}
                     onChange={(e) => {
                         setMed(e.target.value)
@@ -41,8 +41,8 @@ function Ansbox({ inf, close }) {
                 />
                 <Input
                     style={{ width: '320px', borderRadius: 8 }}
-                    placeholder="set start-end"
-
+                    placeholder="TIME(ms)"
+                    value={end}
                     onChange={(e) => {
                         setEnd(e.target.value)
                     }}
@@ -52,6 +52,7 @@ function Ansbox({ inf, close }) {
                     ans.answerSets[0].answers[0].start = end
                     ans.answerSets[0].answers[0].end = end
                     e.preventDefault();
+                    console.log(ans)
                     const resp = await answer(ans)
                     const result = resp?.data
                     console.log(result)

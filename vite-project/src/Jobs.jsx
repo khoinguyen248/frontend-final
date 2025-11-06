@@ -153,7 +153,7 @@ function Jobs() {
       const frame_id = !isString && item && item.frame_id ? item.frame_id : (pathVal ? pathVal.split('/').pop() : "");
       const url = item.video_url
       const time = item.frame_stamp
-      const mstime = time * 1000
+      const mstime = Math.round(time * 1000)
       const fps = item.fps
       const mathfloor = Math.floor(time)
       let minute = Math.floor(time / 60)
@@ -182,7 +182,7 @@ function Jobs() {
               No preview
             </div>
           )}
-          <div>{`${parseInt(L) <= 20 ? "K" : "L"}: ${L}${V ? " - V: " + V : ""} ${frame_id ? "- " + frame_id : ""} - ${minute}m${sec.toFixed(0)}s ${fps} `}  <a href={`${url}&t=${time}s`} target="_blank"
+          <div>{`${parseInt(L.slice(0,2)) <= 20 ? "K" : "L"}: ${L}${V ? " - V: " + V : ""} ${frame_id ? "- " + frame_id : ""} - ${minute}m${sec.toFixed(0)}s ${fps} `}  <a href={`${url}&t=${time}s`} target="_blank"
             rel="noopener noreferrer"><CiLink /></a></div>
           <FaFolderOpen onClick={() => {
             setModalFlag(true);

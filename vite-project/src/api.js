@@ -17,7 +17,7 @@ const ANS = axios.create({
 
 export const search = (data2) => API.post('/search/collection', data2)
 export const searchinfo = (data3) => API.post('/search/infoframes', data3)
-export const answer = (data4) => ANS.post('/api/v2/submit/0afa843c-20b1-4ccd-9ae7-c774b04fe301?session=RwFMpwWkWjNs7JzSf5K8eI3Zo5PBc2Bi', data4)
+export const answer = (data4) => ANS.post('/api/v2/submit/dda49193-bcb6-4e7d-880f-bf7ec60046ee?session=yGkcZDEJjtnz15wA_Hbv1barmIENiUrH', data4)
 
 /*
 export const signup = (data) => API.post('/account/signup', data)

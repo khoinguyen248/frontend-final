@@ -13,8 +13,8 @@ function Ansbox1({inf, close}) {
     }
     
     const infor = inf
-    const [med, setMed] = useState(`${parseInt(infor.L) <= 20 ? "K" : "L"}${infor.L}_V${infor.V}`)
-    const [frameIds, setFrameIds] = useState([""]) // Mảng chứa các frame ID
+    const [med, setMed] = useState(`${parseInt(infor.L.slice(0,2)) <= 20 ? "K" : "L"}${infor.L.slice(0,2)}_V${infor.V}`)
+    const [frameIds, setFrameIds] = useState([infor.frame_id||""]) // Mảng chứa các frame ID
     const [anse, setAnse] = useState("")
 
     // Thêm ô input mới cho frame ID
@@ -51,25 +51,16 @@ function Ansbox1({inf, close}) {
                 >
                     Close
                 </Button>
-                <p>{`${parseInt(infor.L) <= 20 ? "K" : "L"}${infor.L}_V${infor.V}`}</p>
+                <p>{`${parseInt(infor.L.slice(0,2)) <= 20 ? "K" : "L"}${infor.L.slice(0,2)}_V${infor.V}`}</p>
                 <p>{`${infor.mstime}`}</p>
-                <div>{`${parseInt(infor.L) <= 20 ? "K" : "L"}: ${infor.L}${infor.V ? " - V: " + infor.V : ""} ${infor.frame_id ? "- " +infor.frame_id : ""} - ${infor.minute}m${infor.sec.toFixed(0)}s ${infor.fps} `} </div>
+                <div>{`${parseInt(infor.L.slice(0,2)) <= 20 ? "K" : "L"}: ${infor.L.slice(0,2)}${infor.V ? " - V: " + infor.V : ""} ${infor.frame_id ? "- " +infor.frame_id : ""} - ${infor.minute}m${infor.sec.toFixed(0)}s ${infor.fps} `} </div>
                 
                 <Input
                     style={{ width: '320px', borderRadius: 8, marginBottom: '20px' }}
-                    placeholder="set video id"
+                    placeholder="Video_ID"
                     value={med}
                     onChange={(e) => {
                         setMed(e.target.value)
-                    }}
-                />
-                
-                <Input
-                    style={{ width: '320px', borderRadius: 8, marginBottom: '20px' }}
-                    placeholder="set answer"
-                    value={anse}
-                    onChange={(e) => {
-                        setAnse(e.target.value)
                     }}
                 />
 
@@ -91,7 +82,7 @@ function Ansbox1({inf, close}) {
                         <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                             <Input
                                 style={{ width: '280px', borderRadius: 8, marginRight: '8px' }}
-                                placeholder={`Frame ID ${index + 1}`}
+                                placeholder={`Frame_ID ${index + 1}`}
                                 value={frameId}
                                 onChange={(e) => updateFrameId(index, e.target.value)}
                             />
