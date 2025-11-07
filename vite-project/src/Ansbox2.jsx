@@ -14,7 +14,12 @@ function Ansbox1({inf, close}) {
     
     const infor = inf
     const [med, setMed] = useState(`${parseInt(infor.L.slice(0,2)) <= 20 ? "K" : "L"}${infor.L.slice(0,2)}_V${infor.V}`)
-    const [frameIds, setFrameIds] = useState([infor.frame_id||""]) // Mảng chứa các frame ID
+    // Sửa lại phần khởi tạo state với frame_id
+    const [frameIds, setFrameIds] = useState(() => {
+        const initialFrameId = infor.frame_id ? infor.frame_id.toString() : "";
+        console.log("Initial frame ID:", initialFrameId); // Debug log
+        return [initialFrameId];
+    })
     const [anse, setAnse] = useState("")
 
     // Thêm ô input mới cho frame ID
@@ -78,9 +83,8 @@ function Ansbox1({inf, close}) {
 
     // Lấy danh sách frame IDs đã nhập (loại bỏ các ô trống)
     const getFrameIdsString = () => {
-        return frameIds
-            .filter(id => id && typeof id === 'string' && id.trim() !== '')
-            .join(",")
+        const validFrameIds = frameIds.filter(id => id && typeof id === 'string' && id.trim() !== '').map(id => id.trim());
+        return validFrameIds.join(",");
     }
 
     return (
